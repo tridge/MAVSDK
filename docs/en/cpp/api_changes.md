@@ -66,7 +66,7 @@ The install directories are unchanged.
 
 ### System IDs are 32 bit
 
-In preparation for 32-bit MAVLink system IDs, system IDs in the API are now `uint32_t` instead of `uint8_t`:
+System IDs in the API are now `uint32_t` instead of `uint8_t`:
 
 | API | v3 | v4 |
 |---|---|---|
@@ -80,7 +80,22 @@ In preparation for 32-bit MAVLink system IDs, system IDs in the API are now `uin
 
 Component IDs stay `uint8_t`.
 
-MAVSDK does not support system IDs above 255 yet. Configuring one, or passing one to `System::init()`, logs an error and aborts. `MavlinkDirect::send_message()` returns `Result::InvalidField` for target IDs above 255, where v3 silently truncated them.
+MAVSDK supports system IDs through `UINT32_MAX` using the proposed MAVLink 2
+extended headers from [pymavlink#1229](https://github.com/ArduPilot/pymavlink/pull/1229).
+Peers and routers handling wide IDs need the same protocol support. IDs up to 255
+retain their existing wire representation.
+
+`MAVLINK_IFLAG_SYSID32` adds three sender-ID bytes. `MAVLINK_IFLAG_TARGET32`
+adds a four-byte destination only for messages with an existing target-system
+field (including `MANUAL_CONTROL.target`). The payload target byte is then 255;
+the component remains in the payload. There is no capability flag or separate
+8-bit target header. Setting a destination on a targetless MavlinkDirect message
+does not add a target field or header. Component IDs above 255 remain invalid.
+
+The superbuild pins matching MAVLink/pymavlink, libmavlike and libevents revisions.
+Builds using system dependencies must provide these revisions too. Payload
+fields that refer to other systems, such as gimbal control ownership IDs and
+`EVENT.destination_system`, retain their XML-defined widths.
 
 
 ### Plugin API changes
