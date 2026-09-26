@@ -10,11 +10,15 @@
 
 using namespace mavsdk;
 
-TEST(Camera, TakePhoto)
+static void take_photo(uint32_t ground_id, uint32_t camera_id)
 {
-    Mavsdk mavsdk_groundstation{Mavsdk::Configuration{ComponentType::GroundStation}};
+    Mavsdk::Configuration ground_configuration{ComponentType::GroundStation};
+    ground_configuration.set_system_id(ground_id);
+    Mavsdk mavsdk_groundstation{ground_configuration};
 
-    Mavsdk mavsdk_camera{Mavsdk::Configuration{ComponentType::Camera}};
+    Mavsdk::Configuration camera_configuration{ComponentType::Camera};
+    camera_configuration.set_system_id(camera_id);
+    Mavsdk mavsdk_camera{camera_configuration};
 
     ASSERT_EQ(
         mavsdk_groundstation.add_any_connection("udpin://0.0.0.0:17000"),
@@ -100,4 +104,14 @@ TEST(Camera, TakePhoto)
     camera.unsubscribe_capture_info(capture_handle);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+TEST(Camera, TakePhoto)
+{
+    take_photo(245, 1);
+}
+
+TEST(Sysid32, CameraTakePhoto)
+{
+    take_photo(0x80000001U, 0xffffffffU);
 }

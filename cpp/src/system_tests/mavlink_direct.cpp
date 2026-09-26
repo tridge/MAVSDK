@@ -1326,11 +1326,8 @@ TEST(MavlinkDirect, ParamExtValueBinaryRoundtrip)
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
-// MAVLink system/component IDs are still 1 byte on the wire (sysid32 isn't supported yet),
-// but MavlinkMessage.target_system_id/target_component_id are uint32 in the API. Values that
-// don't fit in a byte used to be silently truncated (e.g. 256 -> 0); they must be rejected
-// with Result::InvalidField instead, on both the client and server send paths.
-TEST(MavlinkDirect, TargetIdsOutOfRangeRejected)
+// System IDs span uint32; component IDs must still fit in one byte.
+TEST(MavlinkDirect, WideSystemIdsAcceptedAndOversizedComponentsRejected)
 {
     Mavsdk mavsdk_groundstation{Mavsdk::Configuration{ComponentType::GroundStation}};
     Mavsdk mavsdk_autopilot{Mavsdk::Configuration{ComponentType::Autopilot}};
@@ -1355,7 +1352,7 @@ TEST(MavlinkDirect, TargetIdsOutOfRangeRejected)
     server_message.fields_json = "{}";
 
     server_message.target_system_id = 256;
-    EXPECT_EQ(server.send_message(server_message), MavlinkDirectServer::Result::InvalidField);
+    EXPECT_EQ(server.send_message(server_message), MavlinkDirectServer::Result::Success);
     server_message.target_system_id = 0;
 
     server_message.target_component_id = 256;
@@ -1371,7 +1368,7 @@ TEST(MavlinkDirect, TargetIdsOutOfRangeRejected)
     client_message.fields_json = "{}";
 
     client_message.target_system_id = 4294967295; // uint32 max
-    EXPECT_EQ(client.send_message(client_message), MavlinkDirect::Result::InvalidField);
+    EXPECT_EQ(client.send_message(client_message), MavlinkDirect::Result::Success);
     client_message.target_system_id = 0;
 
     client_message.target_component_id = 300;
