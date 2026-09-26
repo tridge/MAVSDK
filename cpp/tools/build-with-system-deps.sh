@@ -38,12 +38,14 @@ mkdir -p "${DEPS_INSTALL_DIR}"
 
 # Build MAVLink
 # Use the same version as MAVSDK's superbuild (see third_party/CMakeLists.txt)
-MAVLINK_VERSION="d6a7eeaf43319ce6da19a1973ca40180a4210643"
+MAVLINK_VERSION="b63a5555c3b3b9c0cd9752253a64a6ce548205f3"
 echo "=== Building MAVLink (${MAVLINK_VERSION}) ==="
 if [ ! -d "${DEPS_DIR}/mavlink" ]; then
-    git clone https://github.com/mavlink/mavlink.git "${DEPS_DIR}/mavlink"
-    (cd "${DEPS_DIR}/mavlink" && git checkout "${MAVLINK_VERSION}" && git submodule update --init --recursive)
+    git clone https://github.com/tridge/mavlink.git "${DEPS_DIR}/mavlink"
 fi
+# Checked out on every run, not just on first clone, so that bumping the
+# version above takes effect on an existing deps directory too.
+(cd "${DEPS_DIR}/mavlink" && git fetch https://github.com/tridge/mavlink.git "${MAVLINK_VERSION}" && git checkout "${MAVLINK_VERSION}" && git submodule update --init --recursive)
 cmake -B "${DEPS_DIR}/mavlink/build" -S "${DEPS_DIR}/mavlink" \
     -DMAVLINK_DIALECT=ardupilotmega
 cmake --build "${DEPS_DIR}/mavlink/build"
@@ -58,14 +60,14 @@ cp "${DEPS_DIR}/mavlink/message_definitions/v1.0/minimal.xml" \
 
 # Build libevents
 # Use the same version as MAVSDK's superbuild (see third_party/libevents/CMakeLists.txt)
-LIBEVENTS_VERSION="840a88ea226d4eb0fd4c391ce860317422756435"
+LIBEVENTS_VERSION="e9c8f2e6c4b7c1d46bf1e99f414e91a0206d6baf"
 echo "=== Building libevents (${LIBEVENTS_VERSION}) ==="
 if [ ! -d "${DEPS_DIR}/libevents" ]; then
-    git clone https://github.com/mavlink/libevents.git "${DEPS_DIR}/libevents"
-    (cd "${DEPS_DIR}/libevents" && git checkout "${LIBEVENTS_VERSION}")
+    git clone https://github.com/tridge/libevents.git "${DEPS_DIR}/libevents"
     python3 -m pip install -r "${DEPS_DIR}/libevents/requirements.txt" --break-system-packages || \
     python3 -m pip install -r "${DEPS_DIR}/libevents/requirements.txt"
 fi
+(cd "${DEPS_DIR}/libevents" && git fetch https://github.com/tridge/libevents.git "${LIBEVENTS_VERSION}" && git checkout "${LIBEVENTS_VERSION}")
 cmake -B "${DEPS_DIR}/libevents/build" -S "${DEPS_DIR}/libevents/libs/cpp" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON
 cmake --build "${DEPS_DIR}/libevents/build"
@@ -82,10 +84,11 @@ cmake --install "${DEPS_DIR}/PicoSHA2/build" --prefix "${DEPS_INSTALL_DIR}"
 
 # Build libmav
 echo "=== Building libmav ==="
+LIBMAV_VERSION="aab6ed736eec5899d7a9d943829543da38c2c962"
 if [ ! -d "${DEPS_DIR}/libmav" ]; then
-    git clone https://github.com/julianoes/libmavlike "${DEPS_DIR}/libmav"
-    (cd "${DEPS_DIR}/libmav" && git reset --hard 80dbd91a0c5d6f0a79f1e8597b820ba075d1cf15)
+    git clone https://github.com/tridge/libmavlike "${DEPS_DIR}/libmav"
 fi
+(cd "${DEPS_DIR}/libmav" && git fetch https://github.com/tridge/libmavlike.git "${LIBMAV_VERSION}" && git checkout "${LIBMAV_VERSION}")
 cmake -B "${DEPS_DIR}/libmav/build" -S "${DEPS_DIR}/libmav" \
     -DCMAKE_PREFIX_PATH="${DEPS_INSTALL_DIR}" \
     -DCMAKE_POSITION_INDEPENDENT_CODE=ON

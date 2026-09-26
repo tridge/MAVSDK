@@ -1,10 +1,10 @@
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -2,18 +2,21 @@ cmake_minimum_required(VERSION 3.13)
- 
+@@ -2,18 +2,21 @@
+
  project(mavlink)
- 
+
 +if (POLICY CMP0094)
 +    cmake_policy(SET CMP0094 NEW)  # FindPython should return the first matching Python
 +endif ()
@@ -31,12 +31,21 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 -if (NOT ${EXIT_CODE} EQUAL 0)
 -    message(FATAL_ERROR "Python pip not found, pip is required")
 -endif()
- 
+
  if (NOT MAVLINK_DIALECT)
      set(MAVLINK_DIALECT common)
-@@ -28,9 +31,7 @@ message(STATUS "MAVLink version: ${MAVLINK_VERSION}")
- set(EXAMPLE_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/mavlink/${MAVLINK_DIALECT}/mavlink.h)
- 
+@@ -34,7 +37,7 @@
+
+ if (MAVLINK_ENABLE_CXX)
+     set(GENERATE_CXX_COMMAND
+-        COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}/pip-dependencies/" ${Python_EXECUTABLE}
++        COMMAND ${CMAKE_COMMAND} -E env "PYTHONPATH=${CMAKE_CURRENT_SOURCE_DIR}" ${Python_EXECUTABLE}
+         -m pymavlink.tools.mavgen
+         --lang=C++11
+         --wire-protocol=${MAVLINK_VERSION}
+@@ -43,9 +46,7 @@
+ endif()
+
  add_custom_command(OUTPUT ${EXAMPLE_HEADER}
 -    COMMAND ${Python_EXECUTABLE}
 -        -m pip install -r pymavlink/requirements.txt --upgrade -t ${CMAKE_CURRENT_BINARY_DIR}/pip-dependencies/
