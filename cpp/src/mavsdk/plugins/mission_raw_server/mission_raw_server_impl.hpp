@@ -48,7 +48,7 @@ private:
     CallbackList<MissionRawServer::MissionItem> _current_item_changed_callbacks{
         _server_component_impl->io_context()};
     CallbackList<uint32_t> _clear_all_callbacks{_server_component_impl->io_context()};
-    std::atomic<int> _target_system_id;
+    std::atomic<uint32_t> _target_system_id{0};
     std::atomic<int> _target_component_id;
     std::atomic<int> _mission_count;
     std::atomic<bool> _mission_completed;

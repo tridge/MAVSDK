@@ -141,7 +141,9 @@ void MavlinkFtpClient::process_mavlink_ftp_message(const mavlink_message_t& msg)
     mavlink_file_transfer_protocol_t ftp_req;
     mavlink_msg_file_transfer_protocol_decode(&msg, &ftp_req);
 
-    if (ftp_req.target_system != 0 && ftp_req.target_system != _system_impl.get_own_system_id()) {
+    if (mavlink_msg_get_target_sysid(&msg, mavlink_get_msg_entry(msg.msgid)) != 0 &&
+        mavlink_msg_get_target_sysid(&msg, mavlink_get_msg_entry(msg.msgid)) !=
+            _system_impl.get_own_system_id()) {
         if (_debugging) {
             LogDebug("Received FTP message with wrong target system ID");
         }

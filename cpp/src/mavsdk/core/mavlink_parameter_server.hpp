@@ -92,8 +92,8 @@ private:
     void process_param_ext_request_list(const mavlink_message_t& message);
     void broadcast_all_parameters(bool extended);
 
-    bool target_matches(uint16_t target_sys_id, uint16_t target_comp_id, bool is_request);
-    void log_target_mismatch(uint16_t target_sys_id, uint16_t target_comp_id);
+    bool target_matches(uint32_t target_sys_id, uint16_t target_comp_id, bool is_request);
+    void log_target_mismatch(uint32_t target_sys_id, uint16_t target_comp_id);
 
     void send_param_error(const std::string& param_id, int16_t param_index, uint8_t error_code);
 
@@ -102,8 +102,8 @@ private:
     // Must be called with _all_params_mutex held.
     void mark_protocol_seen(bool extended);
     // Enqueue a spontaneous PARAM_VALUE / PARAM_EXT_VALUE broadcast for a changed value.
-    void enqueue_value_broadcast(
-        const std::string& name, const ParamValue& param_value, bool extended);
+    void
+    enqueue_value_broadcast(const std::string& name, const ParamValue& param_value, bool extended);
 
     static std::variant<std::monostate, std::string, std::uint16_t>
     extract_request_read_param_identifier(int16_t param_index, const char* param_id);

@@ -155,7 +155,7 @@ void LogStreamingBackendArdupilot::process_remote_log_data_block(const mavlink_m
     if (_debugging) {
         LogDebug(
             "Received REMOTE_LOG_DATA_BLOCK from {}/{}",
-            static_cast<int>(message.sysid),
+            static_cast<uint32_t>(message.sysid),
             static_cast<int>(message.compid));
     }
 
@@ -172,12 +172,14 @@ void LogStreamingBackendArdupilot::process_remote_log_data_block(const mavlink_m
     mavlink_msg_remote_log_data_block_decode(&message, &block);
 
     // Check if this message is targeted at us
-    if (block.target_system != _system_impl->get_own_system_id() ||
+    const auto target_system =
+        mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid));
+    if (target_system != _system_impl->get_own_system_id() ||
         block.target_component != _system_impl->get_own_component_id()) {
         if (_debugging) {
             LogDebug(
                 "Remote log data block with wrong target {}{}{} instead of {}{}{}",
-                block.target_system,
+                target_system,
                 '/',
                 block.target_component,
                 _system_impl->get_own_system_id(),

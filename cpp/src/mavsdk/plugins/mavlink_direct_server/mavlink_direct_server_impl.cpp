@@ -96,19 +96,14 @@ MavlinkDirectServerImpl::send_message(MavlinkDirectServer::MavlinkMessage messag
         LogDebug("Successfully populated fields for {}", message.message_name);
     }
 
-    // Set target system/component if specified (0 means broadcast).
-    // MAVLink system/component IDs are still 1 byte on the wire (sysid32 not yet supported),
-    // so reject anything that wouldn't round-trip instead of silently truncating it.
-    if (message.target_system_id > 255) {
-        LogErr("target_system_id {} out of range (max 255)", message.target_system_id);
-        return MavlinkDirectServer::Result::InvalidField;
-    }
     if (message.target_component_id > 255) {
-        LogErr("target_component_id {} out of range (max 255)", message.target_component_id);
         return MavlinkDirectServer::Result::InvalidField;
     }
-    if (message.target_system_id != 0) {
-        libmav_message.set("target_system", static_cast<uint8_t>(message.target_system_id));
+
+    // Only messages with a real target field can carry a destination header.
+    const bool has_target = libmav_message.targetSystemField().has_value();
+    if (has_target && message.target_system_id != 0) {
+        libmav_message.setExtendedTarget(message.target_system_id);
     }
     if (message.target_component_id != 0) {
         libmav_message.set("target_component", static_cast<uint8_t>(message.target_component_id));
@@ -124,14 +119,18 @@ MavlinkDirectServerImpl::send_message(MavlinkDirectServer::MavlinkMessage messag
         mavlink_message.len = payload_length;
         memcpy(mavlink_message.payload64, payload_view.first, payload_length);
 
-        mavlink_finalize_message_chan(
+        // A target above 255 has to be handed to the C implementation
+        // separately so it ends up in the extended header rather than being
+        // truncated into the payload.
+        mavlink_finalize_message_chan_target(
             &mavlink_message,
             mavlink_address.system_id,
             mavlink_address.component_id,
             channel,
             payload_length,
             libmav_message.type().maxPayloadSize(),
-            libmav_message.type().crcExtra());
+            libmav_message.type().crcExtra(),
+            has_target && message.target_system_id > 255 ? message.target_system_id : 0);
 
         return mavlink_message;
     });

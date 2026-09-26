@@ -357,7 +357,8 @@ CameraServer::Result CameraServerImpl::respond_take_photo(
                 // Check for error above
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_take_photo_command, MAV_RESULT_ACCEPTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_take_photo_command.origin_system_id);
                 should_send_capture_status = true;
                 // Only break and send the captured below.
                 break;
@@ -365,14 +366,16 @@ CameraServer::Result CameraServerImpl::respond_take_photo(
             case CameraServer::CameraFeedback::Busy: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_take_photo_command, MAV_RESULT_TEMPORARILY_REJECTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_take_photo_command.origin_system_id);
                 break;
             }
 
             case CameraServer::CameraFeedback::Failed: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_take_photo_command, MAV_RESULT_FAILED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_take_photo_command.origin_system_id);
                 break;
             }
         }
@@ -454,7 +457,8 @@ CameraServerImpl::respond_start_video(CameraServer::CameraFeedback start_video_f
             case CameraServer::CameraFeedback::Ok: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_start_video_command, MAV_RESULT_ACCEPTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_start_video_command.origin_system_id);
                 _capture_status.video_status =
                     CameraServer::CaptureStatus::VideoStatus::CaptureInProgress;
                 should_send_capture_status = true;
@@ -463,13 +467,15 @@ CameraServerImpl::respond_start_video(CameraServer::CameraFeedback start_video_f
             case CameraServer::CameraFeedback::Busy: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_start_video_command, MAV_RESULT_TEMPORARILY_REJECTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_start_video_command.origin_system_id);
                 return CameraServer::Result::Success;
             }
             case CameraServer::CameraFeedback::Failed: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_start_video_command, MAV_RESULT_FAILED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_start_video_command.origin_system_id);
                 return CameraServer::Result::Success;
             }
         }
@@ -511,7 +517,8 @@ CameraServerImpl::respond_stop_video(CameraServer::CameraFeedback stop_video_fee
             case CameraServer::CameraFeedback::Ok: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_stop_video_command, MAV_RESULT_ACCEPTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_stop_video_command.origin_system_id);
                 _capture_status.video_status = CameraServer::CaptureStatus::VideoStatus::Idle;
                 should_send_capture_status = true;
                 break;
@@ -519,13 +526,15 @@ CameraServerImpl::respond_stop_video(CameraServer::CameraFeedback stop_video_fee
             case CameraServer::CameraFeedback::Busy: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_stop_video_command, MAV_RESULT_TEMPORARILY_REJECTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_stop_video_command.origin_system_id);
                 return CameraServer::Result::Success;
             }
             case CameraServer::CameraFeedback::Failed: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_stop_video_command, MAV_RESULT_TEMPORARILY_REJECTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_stop_video_command.origin_system_id);
                 return CameraServer::Result::Success;
             }
         }
@@ -565,19 +574,22 @@ CameraServer::Result CameraServerImpl::respond_start_video_streaming(
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_start_video_streaming_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_start_video_streaming_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_start_video_streaming_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_start_video_streaming_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_start_video_streaming_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_start_video_streaming_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -610,19 +622,22 @@ CameraServer::Result CameraServerImpl::respond_stop_video_streaming(
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_stop_video_streaming_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_stop_video_streaming_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_stop_video_streaming_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_stop_video_streaming_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_stop_video_streaming_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_stop_video_streaming_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -654,19 +669,22 @@ CameraServerImpl::respond_set_mode(CameraServer::CameraFeedback set_mode_feedbac
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_set_mode_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_set_mode_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_set_mode_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_set_mode_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_set_mode_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_set_mode_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -700,20 +718,23 @@ CameraServer::Result CameraServerImpl::respond_storage_information(
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_storage_information_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_storage_information_command.origin_system_id);
             // break and send storage information
             break;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_storage_information_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_storage_information_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_storage_information_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_storage_information_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -842,20 +863,23 @@ CameraServer::Result CameraServerImpl::respond_capture_status(
             case CameraServer::CameraFeedback::Ok: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_capture_status_command, MAV_RESULT_ACCEPTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_capture_status_command.origin_system_id);
                 // break and send capture status
                 break;
             }
             case CameraServer::CameraFeedback::Busy: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_capture_status_command, MAV_RESULT_TEMPORARILY_REJECTED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_capture_status_command.origin_system_id);
                 return CameraServer::Result::Success;
             }
             case CameraServer::CameraFeedback::Failed: {
                 auto command_ack = _server_component_impl->make_command_ack_message(
                     _last_capture_status_command, MAV_RESULT_FAILED);
-                _server_component_impl->send_command_ack(command_ack);
+                _server_component_impl->send_command_ack(
+                    command_ack, _last_capture_status_command.origin_system_id);
                 return CameraServer::Result::Success;
             }
         }
@@ -893,19 +917,22 @@ CameraServerImpl::respond_format_storage(CameraServer::CameraFeedback format_sto
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_format_storage_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_format_storage_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_format_storage_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_format_storage_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_format_storage_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_format_storage_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -937,19 +964,22 @@ CameraServerImpl::respond_reset_settings(CameraServer::CameraFeedback reset_sett
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_reset_settings_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_reset_settings_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_reset_settings_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_reset_settings_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_reset_settings_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_reset_settings_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -982,19 +1012,22 @@ CameraServer::Result CameraServerImpl::respond_tracking_point_command(
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_track_point_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_track_point_command.origin_system_id);
             break;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_track_point_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_track_point_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_track_point_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_track_point_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -1028,19 +1061,22 @@ CameraServer::Result CameraServerImpl::respond_tracking_rectangle_command(
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_track_rectangle_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_track_rectangle_command.origin_system_id);
             break;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_track_rectangle_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_track_rectangle_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_track_rectangle_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_track_rectangle_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -1074,19 +1110,22 @@ CameraServerImpl::respond_tracking_off_command(CameraServer::CameraFeedback trac
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_tracking_off_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_tracking_off_command.origin_system_id);
             break;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_tracking_off_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_tracking_off_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_tracking_off_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_tracking_off_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -1176,7 +1215,7 @@ CameraServerImpl::send_camera_information(const MavlinkCommandReceiver::CommandL
     // ack needs to be sent before camera information message
     auto command_ack =
         _server_component_impl->make_command_ack_message(command, MAV_RESULT::MAV_RESULT_ACCEPTED);
-    _server_component_impl->send_command_ack(command_ack);
+    _server_component_impl->send_command_ack(command_ack, command.origin_system_id);
 
     // It is safe to ignore the return value of parse_version_string() here
     // since the string was already validated in set_information().
@@ -1277,7 +1316,7 @@ std::optional<mavlink_command_ack_t> CameraServerImpl::process_camera_settings_r
     // ack needs to be sent before camera information message
     auto command_ack =
         _server_component_impl->make_command_ack_message(command, MAV_RESULT::MAV_RESULT_ACCEPTED);
-    _server_component_impl->send_command_ack(command_ack);
+    _server_component_impl->send_command_ack(command_ack, command.origin_system_id);
     LogDebug("Sent settings ack");
 
     // unsupported
@@ -1554,7 +1593,7 @@ CameraServerImpl::send_fov_status(const MavlinkCommandReceiver::CommandLong& com
 
     auto ack =
         _server_component_impl->make_command_ack_message(command, MAV_RESULT::MAV_RESULT_ACCEPTED);
-    _server_component_impl->send_command_ack(ack);
+    _server_component_impl->send_command_ack(ack, command.origin_system_id);
 
     _server_component_impl->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
         mavlink_message_t message{};
@@ -1962,7 +2001,7 @@ CameraServerImpl::process_image_start_capture(const MavlinkCommandReceiver::Comm
         // MAV_RESULT_ACCEPTED must be sent before CAMERA_IMAGE_CAPTURED
         auto command_ack = _server_component_impl->make_command_ack_message(
             command, MAV_RESULT::MAV_RESULT_IN_PROGRESS);
-        _server_component_impl->send_command_ack(command_ack);
+        _server_component_impl->send_command_ack(command_ack, command.origin_system_id);
 
         _last_take_photo_command = command;
 
@@ -2100,7 +2139,7 @@ std::optional<mavlink_command_ack_t> CameraServerImpl::process_video_stream_info
     if (_is_video_streaming_set) {
         auto command_ack = _server_component_impl->make_command_ack_message(
             command, MAV_RESULT::MAV_RESULT_ACCEPTED);
-        _server_component_impl->send_command_ack(command_ack);
+        _server_component_impl->send_command_ack(command_ack, command.origin_system_id);
         LogDebug("Sent video streaming ack");
 
         const char name[32] = "";
@@ -2156,7 +2195,7 @@ std::optional<mavlink_command_ack_t> CameraServerImpl::process_video_stream_stat
 
     auto command_ack =
         _server_component_impl->make_command_ack_message(command, MAV_RESULT::MAV_RESULT_ACCEPTED);
-    _server_component_impl->send_command_ack(command_ack);
+    _server_component_impl->send_command_ack(command_ack, command.origin_system_id);
     LogDebug("Sent video streaming ack");
 
     _server_component_impl->queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {
@@ -2208,19 +2247,22 @@ CameraServerImpl::respond_zoom_in_start(CameraServer::CameraFeedback zoom_in_sta
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_in_start_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_in_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_in_start_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_in_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_in_start_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_in_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -2252,19 +2294,22 @@ CameraServerImpl::respond_zoom_out_start(CameraServer::CameraFeedback zoom_out_s
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_out_start_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_out_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_out_start_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_out_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_out_start_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_out_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -2296,19 +2341,22 @@ CameraServerImpl::respond_zoom_stop(CameraServer::CameraFeedback zoom_stop_feedb
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_stop_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_stop_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_stop_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_stop_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_stop_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_stop_command.origin_system_id);
             return CameraServer::Result::Success;
         }
     }
@@ -2336,19 +2384,22 @@ CameraServerImpl::respond_zoom_range(CameraServer::CameraFeedback zoom_range_fee
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_range_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_range_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_range_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_range_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_zoom_range_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_zoom_range_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2379,19 +2430,22 @@ CameraServerImpl::respond_focus_in_step(CameraServer::CameraFeedback focus_in_st
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_in_step_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_in_step_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_in_step_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_in_step_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_in_step_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_in_step_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2422,19 +2476,22 @@ CameraServerImpl::respond_focus_out_step(CameraServer::CameraFeedback focus_out_
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_out_step_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_out_step_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_out_step_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_out_step_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_out_step_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_out_step_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2465,19 +2522,22 @@ CameraServerImpl::respond_focus_in_start(CameraServer::CameraFeedback focus_in_s
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_in_start_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_in_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_in_start_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_in_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_in_start_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_in_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2508,19 +2568,22 @@ CameraServerImpl::respond_focus_out_start(CameraServer::CameraFeedback focus_out
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_out_start_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_out_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_out_start_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_out_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_out_start_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_out_start_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2551,19 +2614,22 @@ CameraServerImpl::respond_focus_stop(CameraServer::CameraFeedback focus_stop_fee
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_stop_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_stop_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_stop_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_stop_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_stop_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_stop_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2594,19 +2660,22 @@ CameraServerImpl::respond_focus_range(CameraServer::CameraFeedback focus_range_f
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_range_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_range_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_range_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_range_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_range_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_range_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2637,19 +2706,22 @@ CameraServerImpl::respond_focus_meters(CameraServer::CameraFeedback focus_meters
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_meters_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_meters_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_meters_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_meters_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_meters_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_meters_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2680,19 +2752,22 @@ CameraServerImpl::respond_focus_auto(CameraServer::CameraFeedback focus_auto_fee
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2723,19 +2798,22 @@ CameraServerImpl::respond_focus_auto_single(CameraServer::CameraFeedback focus_a
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_single_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_single_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_single_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_single_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_single_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_single_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:
@@ -2767,19 +2845,22 @@ CameraServer::Result CameraServerImpl::respond_focus_auto_continuous(
         case CameraServer::CameraFeedback::Ok: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_continuous_command, MAV_RESULT_ACCEPTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_continuous_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Busy: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_continuous_command, MAV_RESULT_TEMPORARILY_REJECTED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_continuous_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Failed: {
             auto command_ack = _server_component_impl->make_command_ack_message(
                 _last_focus_auto_continuous_command, MAV_RESULT_FAILED);
-            _server_component_impl->send_command_ack(command_ack);
+            _server_component_impl->send_command_ack(
+                command_ack, _last_focus_auto_continuous_command.origin_system_id);
             return CameraServer::Result::Success;
         }
         case CameraServer::CameraFeedback::Unknown:

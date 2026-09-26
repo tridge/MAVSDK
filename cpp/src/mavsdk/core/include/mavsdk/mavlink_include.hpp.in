@@ -2,6 +2,11 @@
 
 #include "mavlink/mavlink_types.h"
 
+#if !defined(MAVLINK_TARGET32_HEADER_EXTRA) || MAVLINK_TARGET32_HEADER_EXTRA != 4 || \
+    !defined(MAVLINK_TARGET_SYSTEM_SENTINEL) || MAVLINK_TARGET_SYSTEM_SENTINEL != 255
+#error "MAVSDK requires MAVLink headers with four-byte TARGET32 and the 255 target sentinel"
+#endif
+
 // We provide our own mavlink_get_channel_status with controlled storage,
 // and export it so that tests can link against it.
 #define MAVLINK_GET_CHANNEL_STATUS

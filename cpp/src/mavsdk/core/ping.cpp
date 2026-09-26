@@ -41,7 +41,8 @@ void Ping::process_ping(const mavlink_message_t& message)
     mavlink_ping_t ping;
     mavlink_msg_ping_decode(&message, &ping);
 
-    if (ping.target_system == 0 && ping.target_component == 0) {
+    if (mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)) == 0 &&
+        ping.target_component == 0) {
         // Response to ping request.
 
         _system_impl.queue_message([&](MavlinkAddress mavlink_address, uint8_t channel) {

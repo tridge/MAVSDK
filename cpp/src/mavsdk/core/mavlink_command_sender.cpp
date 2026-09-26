@@ -92,7 +92,7 @@ void MavlinkCommandSender::queue_command_async(
         LogDebug(
             "COMMAND_INT {} to send to {}, {}",
             static_cast<int>(command.command),
-            static_cast<int>(command.target_system_id),
+            command.target_system_id,
             static_cast<int>(command.target_component_id));
     }
 
@@ -128,7 +128,7 @@ void MavlinkCommandSender::queue_command_async(
         LogDebug(
             "COMMAND_LONG {} to send to {}, {}",
             static_cast<int>(command.command),
-            static_cast<int>(command.target_system_id),
+            command.target_system_id,
             static_cast<int>(command.target_component_id));
     }
 
@@ -163,18 +163,20 @@ void MavlinkCommandSender::receive_command_ack(const mavlink_message_t& message)
     mavlink_command_ack_t command_ack;
     mavlink_msg_command_ack_decode(&message, &command_ack);
 
-    if ((command_ack.target_system &&
-         command_ack.target_system != _system_impl.get_own_system_id()) ||
+    if ((mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)) &&
+         mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)) !=
+             _system_impl.get_own_system_id()) ||
         (command_ack.target_component &&
          command_ack.target_component != _system_impl.get_own_component_id())) {
         if (_command_debugging) {
             LogDebug(
                 "Ignoring command ack for command {} from {}{}{} to {}{}{}",
                 static_cast<int>(command_ack.command),
-                static_cast<int>(message.sysid),
+                static_cast<uint32_t>(message.sysid),
                 '/',
                 static_cast<int>(message.compid),
-                static_cast<int>(command_ack.target_system),
+                static_cast<int>(
+                    mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid))),
                 '/',
                 static_cast<int>(command_ack.target_component));
         }
@@ -198,7 +200,7 @@ void MavlinkCommandSender::receive_command_ack(const mavlink_message_t& message)
                 LogDebug(
                     "Command ack for {} (from: {}/{}) does not match command {} (to: {}/{}) after {} s",
                     command_ack.command,
-                    message.sysid,
+                    static_cast<uint32_t>(message.sysid),
                     message.compid,
                     work->identification.command,
                     work->identification.target_system_id,
@@ -316,7 +318,7 @@ void MavlinkCommandSender::receive_command_ack(const mavlink_message_t& message)
     if (_command_debugging) {
         LogDebug(
             "Received ack from {}{}{} for not-existing command: {}! Ignoring...",
-            static_cast<int>(message.sysid),
+            static_cast<uint32_t>(message.sysid),
             '/',
             static_cast<int>(message.compid),
             static_cast<int>(command_ack.command));
@@ -381,7 +383,7 @@ void MavlinkCommandSender::receive_timeout(const CommandIdentification& identifi
         } else {
             // We have tried retransmitting, giving up now.
             if (work->identification.command == 512) {
-                uint8_t target_sysid;
+                uint32_t target_sysid;
                 uint8_t target_compid;
                 if (auto command_int = std::get_if<CommandInt>(&work->command)) {
                     target_sysid = command_int->target_system_id;

@@ -344,8 +344,13 @@ void MavlinkParameterServer::process_param_set(const mavlink_message_t& message)
 {
     mavlink_param_set_t set_request{};
     mavlink_msg_param_set_decode(&message, &set_request);
-    if (!target_matches(set_request.target_system, set_request.target_component, false)) {
-        log_target_mismatch(set_request.target_system, set_request.target_component);
+    if (!target_matches(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            set_request.target_component,
+            false)) {
+        log_target_mismatch(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            set_request.target_component);
         return;
     }
     const std::string safe_param_id = extract_safe_param_id(set_request.param_id);
@@ -368,8 +373,13 @@ void MavlinkParameterServer::process_param_ext_set(const mavlink_message_t& mess
 {
     mavlink_param_ext_set_t set_request{};
     mavlink_msg_param_ext_set_decode(&message, &set_request);
-    if (!target_matches(set_request.target_system, set_request.target_component, false)) {
-        log_target_mismatch(set_request.target_system, set_request.target_component);
+    if (!target_matches(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            set_request.target_component,
+            false)) {
+        log_target_mismatch(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            set_request.target_component);
         return;
     }
     const std::string safe_param_id = extract_safe_param_id(set_request.param_id);
@@ -396,8 +406,13 @@ void MavlinkParameterServer::process_param_request_read(const mavlink_message_t&
     }
     mavlink_param_request_read_t read_request{};
     mavlink_msg_param_request_read_decode(&message, &read_request);
-    if (!target_matches(read_request.target_system, read_request.target_component, true)) {
-        log_target_mismatch(read_request.target_system, read_request.target_component);
+    if (!target_matches(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            read_request.target_component,
+            true)) {
+        log_target_mismatch(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            read_request.target_component);
         return;
     }
 
@@ -426,8 +441,13 @@ void MavlinkParameterServer::process_param_ext_request_read(const mavlink_messag
 {
     mavlink_param_ext_request_read_t read_request{};
     mavlink_msg_param_ext_request_read_decode(&message, &read_request);
-    if (!target_matches(read_request.target_system, read_request.target_component, true)) {
-        log_target_mismatch(read_request.target_system, read_request.target_component);
+    if (!target_matches(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            read_request.target_component,
+            true)) {
+        log_target_mismatch(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            read_request.target_component);
         return;
     }
     const auto param_id_or_index =
@@ -527,8 +547,13 @@ void MavlinkParameterServer::process_param_request_list(const mavlink_message_t&
 {
     mavlink_param_request_list_t list_request{};
     mavlink_msg_param_request_list_decode(&message, &list_request);
-    if (!target_matches(list_request.target_system, list_request.target_component, true)) {
-        log_target_mismatch(list_request.target_system, list_request.target_component);
+    if (!target_matches(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            list_request.target_component,
+            true)) {
+        log_target_mismatch(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            list_request.target_component);
         return;
     }
     broadcast_all_parameters(false);
@@ -542,8 +567,13 @@ void MavlinkParameterServer::process_param_ext_request_list(const mavlink_messag
 
     mavlink_param_ext_request_list_t ext_list_request{};
     mavlink_msg_param_ext_request_list_decode(&message, &ext_list_request);
-    if (!target_matches(ext_list_request.target_system, ext_list_request.target_component, true)) {
-        log_target_mismatch(ext_list_request.target_system, ext_list_request.target_component);
+    if (!target_matches(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            ext_list_request.target_component,
+            true)) {
+        log_target_mismatch(
+            mavlink_msg_get_target_sysid(&message, mavlink_get_msg_entry(message.msgid)),
+            ext_list_request.target_component);
         return;
     }
     broadcast_all_parameters(true);
@@ -761,7 +791,7 @@ std::ostream& operator<<(std::ostream& str, const MavlinkParameterServer::Result
 }
 
 bool MavlinkParameterServer::target_matches(
-    const uint16_t target_sys_id, const uint16_t target_comp_id, bool is_request)
+    const uint32_t target_sys_id, const uint16_t target_comp_id, bool is_request)
 {
     // See: https://mavlink.io/en/services/parameter.html#multi-system-and-multi-component-support
 
@@ -775,7 +805,7 @@ bool MavlinkParameterServer::target_matches(
     return target_comp_id == _sender.get_own_component_id();
 }
 
-void MavlinkParameterServer::log_target_mismatch(uint16_t target_sys_id, uint16_t target_comp_id)
+void MavlinkParameterServer::log_target_mismatch(uint32_t target_sys_id, uint16_t target_comp_id)
 {
     if (!_parameter_debugging) {
         return;

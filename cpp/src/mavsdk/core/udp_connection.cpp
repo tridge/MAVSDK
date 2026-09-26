@@ -261,7 +261,7 @@ void UdpConnection::add_remote_to_keep(const std::string& remote_ip, const int r
 void UdpConnection::add_remote_impl(
     const std::string& remote_ip,
     const int remote_port,
-    const uint8_t remote_sysid,
+    const uint32_t remote_sysid,
     RemoteOption remote_option)
 {
     std::lock_guard<std::mutex> lock(_remote_mutex);
@@ -277,12 +277,12 @@ void UdpConnection::add_remote_impl(
         });
 
     if (existing_remote == _remotes.end()) {
-        if (static_cast<int>(remote_sysid) != 0) {
+        if (remote_sysid != 0) {
             LogInfo(
                 "New system on: {}:{} (system ID: {})",
                 new_remote.ip,
                 new_remote.port_number,
-                static_cast<int>(remote_sysid));
+                remote_sysid);
         }
         _remotes.push_back(new_remote);
     } else {
@@ -330,7 +330,7 @@ void UdpConnection::do_receive()
             auto parse_result = _mavlink_receiver->parse_message();
             while (parse_result != MavlinkReceiver::ParseResult::NoneAvailable) {
                 if (parse_result == MavlinkReceiver::ParseResult::MessageParsed) {
-                    const uint8_t sysid = _mavlink_receiver->get_last_message().sysid;
+                    const uint32_t sysid = _mavlink_receiver->get_last_message().sysid;
                     if (sysid != 0) {
                         add_remote_impl(
                             _sender_endpoint.address().to_string(),

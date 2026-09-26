@@ -142,19 +142,16 @@ bool LibmavReceiver::parse_libmav_message_from_buffer()
         _last_message.raw_bytes.clear();
     }
 
-    // Extract target_system and target_component if present in message fields
     uint8_t target_system_id = 0;
     uint8_t target_component_id = 0;
-    if (message.get("target_system", target_system_id) == mav::MessageResult::Success) {
-        _last_message.target_system_id = target_system_id;
-    } else {
-        _last_message.target_system_id = 0;
+    if (const auto target_field = message.targetSystemField()) {
+        message.get(
+            message.name() == "MANUAL_CONTROL" ? "target" : "target_system", target_system_id);
     }
-    if (message.get("target_component", target_component_id) == mav::MessageResult::Success) {
-        _last_message.target_component_id = target_component_id;
-    } else {
-        _last_message.target_component_id = 0;
-    }
+    message.get("target_component", target_component_id);
+    _last_message.target_system_id =
+        header.isTargetted() ? message.extendedTargetSystemId() : target_system_id;
+    _last_message.target_component_id = target_component_id;
 
     _last_message.fields_json = json;
 

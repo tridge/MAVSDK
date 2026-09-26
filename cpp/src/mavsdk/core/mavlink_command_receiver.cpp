@@ -44,6 +44,11 @@ void MavlinkCommandReceiver::receive_command_int(const mavlink_message_t& messag
         LogDebug("Received command int {}", cmd.command);
     }
 
+    if (cmd.target_system_id != 0 &&
+        cmd.target_system_id != _server_component_impl.get_own_system_id()) {
+        return;
+    }
+
     if (cmd.target_component_id != _server_component_impl.get_own_component_id() &&
         cmd.target_component_id != MAV_COMP_ID_ALL) {
         if (_debugging) {
@@ -67,15 +72,23 @@ void MavlinkCommandReceiver::receive_command_int(const mavlink_message_t& messag
             auto maybe_command_ack = handler.callback(cmd);
             if (maybe_command_ack) {
                 _server_component_impl.queue_message(
-                    [ack = maybe_command_ack.value()](
+                    [ack = maybe_command_ack.value(), origin_system_id = cmd.origin_system_id](
                         MavlinkAddress mavlink_address, uint8_t channel) {
                         mavlink_message_t response_message;
-                        mavlink_msg_command_ack_encode_chan(
+                        // Packed rather than encoded because mavlink_command_ack_t's
+                        // target_system is only 8 bits wide, which would truncate the
+                        // origin of a command from a system above 255.
+                        mavlink_msg_command_ack_pack_chan(
                             mavlink_address.system_id,
                             mavlink_address.component_id,
                             channel,
                             &response_message,
-                            &ack);
+                            ack.command,
+                            ack.result,
+                            ack.progress,
+                            ack.result_param2,
+                            origin_system_id,
+                            ack.target_component);
                         return response_message;
                     });
 
@@ -96,6 +109,11 @@ void MavlinkCommandReceiver::receive_command_long(const mavlink_message_t& messa
 
     if (_debugging) {
         LogDebug("Received command long {}", cmd.command);
+    }
+
+    if (cmd.target_system_id != 0 &&
+        cmd.target_system_id != _server_component_impl.get_own_system_id()) {
+        return;
     }
 
     if (cmd.target_component_id != _server_component_impl.get_own_component_id() &&
@@ -121,15 +139,23 @@ void MavlinkCommandReceiver::receive_command_long(const mavlink_message_t& messa
             auto maybe_command_ack = handler.callback(cmd);
             if (maybe_command_ack) {
                 _server_component_impl.queue_message(
-                    [ack = maybe_command_ack.value()](
+                    [ack = maybe_command_ack.value(), origin_system_id = cmd.origin_system_id](
                         MavlinkAddress mavlink_address, uint8_t channel) {
                         mavlink_message_t response_message;
-                        mavlink_msg_command_ack_encode_chan(
+                        // Packed rather than encoded because mavlink_command_ack_t's
+                        // target_system is only 8 bits wide, which would truncate the
+                        // origin of a command from a system above 255.
+                        mavlink_msg_command_ack_pack_chan(
                             mavlink_address.system_id,
                             mavlink_address.component_id,
                             channel,
                             &response_message,
-                            &ack);
+                            ack.command,
+                            ack.result,
+                            ack.progress,
+                            ack.result_param2,
+                            origin_system_id,
+                            ack.target_component);
                         return response_message;
                     });
                 if (_debugging) {

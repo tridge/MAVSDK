@@ -210,9 +210,8 @@ public:
         /**
          * @brief Create new Configuration via manually configured
          * system and component ID.
-         * @param system_id the system id to store in this configuration. The type is 32 bits wide
-         * for MAVLink's extended system ids, which are not supported yet. Applying a configuration
-         * with an id above 255 logs an error and aborts.
+         * @param system_id the system id to store in this configuration. Ids above 255 require
+         * peers that support MAVLink's extended system ids.
          * @param component_id the component id to store in this configuration
          * @param always_send_heartbeats send heartbeats by default even without a system connected
          */
@@ -237,9 +236,9 @@ public:
         /**
          * @brief Set the system id of this configuration.
          *
-         * The type is 32 bits wide for MAVLink's extended system ids, which
-         * are not supported yet. Applying a configuration with an id above
-         * 255 logs an error and aborts.
+         * Ids from 1-255 are understood by every MAVLink peer. Larger ids
+         * require the peer to support MAVLink's 32 bit system ids, and are
+         * sent using an extended header.
          */
         void set_system_id(uint32_t system_id);
 
@@ -642,7 +641,8 @@ public:
      *        To drop a message, return 'false' from the callback.
      */
 #ifdef MAVSDK_ENABLE_MAVLINK_C_API
-    DEPRECATED void intercept_incoming_messages_async(std::function<bool(mavlink_message_t&)> callback);
+    DEPRECATED void
+    intercept_incoming_messages_async(std::function<bool(mavlink_message_t&)> callback);
 #endif
 
     /**
@@ -690,7 +690,8 @@ public:
      *        To drop a message, return 'false' from the callback.
      */
 #ifdef MAVSDK_ENABLE_MAVLINK_C_API
-    DEPRECATED void intercept_outgoing_messages_async(std::function<bool(mavlink_message_t&)> callback);
+    DEPRECATED void
+    intercept_outgoing_messages_async(std::function<bool(mavlink_message_t&)> callback);
 #endif
 
     /**

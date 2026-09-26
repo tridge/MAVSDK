@@ -67,7 +67,8 @@ ArmAuthorizerServerImpl::accept_arm_authorization(int32_t valid_time_s) const
     // authorization is valid
     command_ack.result_param2 = valid_time_s;
 
-    if (!_server_component_impl->send_command_ack(command_ack)) {
+    if (!_server_component_impl->send_command_ack(
+            command_ack, _last_arm_authorization_request_command.origin_system_id)) {
         return ArmAuthorizerServer::Result::Failed;
     }
     return ArmAuthorizerServer::Result::Success;
@@ -108,7 +109,8 @@ ArmAuthorizerServer::Result ArmAuthorizerServerImpl::reject_arm_authorization(
     // Fill in the extra information. It is dependent on the decision, and and reason
     command_ack.result_param2 = extra_info;
 
-    if (!_server_component_impl->send_command_ack(command_ack)) {
+    if (!_server_component_impl->send_command_ack(
+            command_ack, _last_arm_authorization_request_command.origin_system_id)) {
         return ArmAuthorizerServer::Result::Failed;
     }
 
